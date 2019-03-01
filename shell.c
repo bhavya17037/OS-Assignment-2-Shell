@@ -18,13 +18,25 @@ int parser(char * command, char *arr[]) {
     return i;
 }
 
+void execute_command(char *command){
+	if(strstr(command, ">>")){
+		// >> case
+	}else if(strstr(command, ">&")){
+		// >& case
+	}else if(strstr(command, ">")){
+		// > case
+	}else if(strstr(command, "|")){
+		// pipe case
+	}else{
+		// simple command case
+	}
+}
+
 int main(){
 
-	char inp[1000];
-	char *arr[100];
-
 	while(1){
-
+		char inp[1000];
+		char *arr[100];
 		printf("shell>");
 		scanf("%s", inp);
 		if(strcmp(inp,"exit") == 0){
