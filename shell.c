@@ -17,6 +17,20 @@ void execute(char *) {
 
 }
 
+void execute_command(char *command){
+	if(strstr(command, ">>")){
+		// >> case
+	}else if(strstr(command, ">&")){
+		// >& case
+	}else if(strstr(command, ">")){
+		// > case
+	}else if(strstr(command, "|")){
+		// pipe case
+	}else{
+		// simple command case
+	}
+}
+
 int main(){
 
 	while(1) {
