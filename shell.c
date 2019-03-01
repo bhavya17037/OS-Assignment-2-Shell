@@ -1,57 +1,42 @@
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h> 
+#include <unistd.h> 
 
-int parser(char * command, char *arr[]) {
+void parser(char *input, char **command) {
+	char *parsedInput = strtok(input, "|");
+
 	int i = 0;
-
-	char *p = strtok(command, "|");
-	// if(p != NULL){
-	// 	arr[0] = command;
-	// }
-
-    while (p != NULL)
-    {
-        arr[i++] = p;
-        p = strtok (NULL, "|");
-    }
-
-    return i;
+	while(parsedInput != NULL) {
+		command[i++] = parsedInput;
+		parsedInput = strtok(NULL, "|");
+	}
 }
 
-void execute_command(char *command){
-	if(strstr(command, ">>")){
-		// >> case
-	}else if(strstr(command, ">&")){
-		// >& case
-	}else if(strstr(command, ">")){
-		// > case
-	}else if(strstr(command, "|")){
-		// pipe case
-	}else{
-		// simple command case
-	}
+void execute(char *) {
+
 }
 
 int main(){
 
-	while(1){
-		char inp[1000];
-		char *arr[100];
-		printf("shell>");
-		scanf("%s", inp);
-		if(strcmp(inp,"exit") == 0){
+	while(1) {
+		char input[100000];
+		printf("%s", "shell: root$ ");
+		scanf("%s",input);
+
+		if (strcmp(input,"exit") == 0) {
 			break;
 		}
-		
-		int len = parser(inp,arr);
-		if(len == 0){	// non pipe input
-			printf("%s\n", inp);
-		}else{
-			for(int i = 0; i < len; i++){
-				printf("%s\n", arr[i]);
-			}
+
+		char *command[1000];
+		memset(command, '\0', sizeof(command));
+		parser(input, &command[0]);
+		int i = 0;
+		while(command[i] != NULL) {
+			printf("%s\n", command[i]);
+			i++;
 		}
 	}
-
 	return 0;
 }
+
