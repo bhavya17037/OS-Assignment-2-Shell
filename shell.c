@@ -26,8 +26,8 @@ void execute(char **comm) {
 	if(pid == 0){
 		if(execvp(comm[0], comm) < 0){
 			printf("Something went wrong! Could not execute!\n");
-			return;
 		}
+		exit(0);
 	}else if(pid == -1){
 		printf("Illegal command!\n");
 		return;
