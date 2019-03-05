@@ -20,7 +20,7 @@ void sigint_handler(int signo) {
 
 			printf("%s\n", "inside handler");
 			if(getpid() != curr_pid){
-				//printf("pid in handler: %d\n", getpid());
+				printf("pid in handler: %d\n", getpid());
 				killed = 1;
 				//printf("%s\n", "yoo");
 				kill(getpid(), SIGKILL);
@@ -31,6 +31,8 @@ void sigint_handler(int signo) {
 			break;
 		default:
 			break;
+
+
 	}
 }
 
@@ -145,7 +147,7 @@ void execute(char **command) {
 	int fd[2];
 	int in = 0;
 	killed = 0;
-	signal(SIGINT, sigint_handler);
+	//signal(SIGINT, sigint_handler);
 	while (command[i] != NULL) {
 
 		// printf("%s%d\n", "Executing command: ", i);
@@ -225,10 +227,12 @@ int main() {
 	//signal(SIGINT, sigint_handler);
 	killed = 0;
 	while(1) {
-		struct sigaction psa;
-		memset (&psa, 0, sizeof (psa));
-    	psa.sa_handler = sigint_handler;
-    	sigaction(SIGINT, &psa, NULL);
+		struct sigaction sa;
+		memset (&sa, 0, sizeof (sa));
+		sa.sa_handler = sigint_handler;
+    	sigemptyset(&(sa.sa_mask));
+    	sigaddset(&(sa.sa_mask), SIGINT);
+    	sigaction(SIGINT, &sa, NULL);
 		curr_pid = getpid();
 		//printf("curr_pid: %d\n", curr_pid);
 		char input[1024];
