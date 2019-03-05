@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <sys/types.h> 
 #include <unistd.h> 
 #include <sys/types.h>
@@ -8,18 +9,29 @@
 #include <fcntl.h> 
 #include <errno.h> 
 
-pid_t pid;
+pid_t pid, curr_pid;
 pid_t child_pid = -1;
-int killit;
-//char starting[100];
+int killed = 0;
+
 void sigint_handler(int signo) {
-	if(killit == 1){
-		return;
-	}else{
-		killit = 1;
-		kill(pid, SIGKILL);
+
+	switch (signo) {
+		case SIGINT:
+
+			printf("%s\n", "inside handler");
+			if(getpid() != curr_pid){
+				//printf("pid in handler: %d\n", getpid());
+				killed = 1;
+				//printf("%s\n", "yoo");
+				kill(getpid(), SIGKILL);
+				fflush(stdout);
+				//printf("%s\n", "heree");
+			}
+			main();
+			break;
+		default:
+			break;
 	}
-    printf("Caught SIGINT\n");
 }
 
 char *trimwhitespace(char *str)
@@ -132,25 +144,26 @@ void execute(char **command) {
 	int i = 0;
 	int fd[2];
 	int in = 0;
-
+	killed = 0;
+	signal(SIGINT, sigint_handler);
 	while (command[i] != NULL) {
 
 		// printf("%s%d\n", "Executing command: ", i);
 		char *cmd = command[i];
-		
+		child_pid = -1;
 		pipe(fd);
 		pid = fork();
-		child_pid = pid;
-		if(strcmp(command[0], "exit") != 0){
-			killit = -1;
-		}
+		
 		if (pid == 0) {
-			//child_pid = pid;
-			signal(SIGINT, sigint_handler);
-
-			while(killit == -1){
-				printf("%s\n", "in child");
-			}
+			//signal(SIGINT, sigint_handler);
+			//sigaction(SIGTSTP, &psa, NULL);
+			child_pid = pid;
+			printf("%s\n", "child_pid is 0...yay");
+		
+			printf("%s\n", "child process running...");
+			while(killed == 0);
+			//printf("%s\n", "child process stopped in between...");
+			//return;
 
 			int a = redirection(cmd, "<");
 
@@ -190,10 +203,15 @@ void execute(char **command) {
 				}
 				close(fd[0]);
 				execvp(to_execute, args);
+
+
+
 			}
 		} else if (pid < 0) {
+			//signal(SIGINT, sigint_handler);
 			printf("%s\n", "Error while executing fork");
 		} else {
+			//signal(SIGINT, sigint_handler);
 			wait(0);
 			//child_pid = pid;
 			close(fd[1]);
@@ -204,11 +222,15 @@ void execute(char **command) {
 }
 
 int main() {
-
-	signal(SIGINT, sigint_handler);
-	killit = -1;
+	//signal(SIGINT, sigint_handler);
+	killed = 0;
 	while(1) {
-
+		struct sigaction psa;
+		memset (&psa, 0, sizeof (psa));
+    	psa.sa_handler = sigint_handler;
+    	sigaction(SIGINT, &psa, NULL);
+		curr_pid = getpid();
+		//printf("curr_pid: %d\n", curr_pid);
 		char input[1024];
 		printf("%s", "shell: root$ ");
 		fgets(input,1024,stdin);
