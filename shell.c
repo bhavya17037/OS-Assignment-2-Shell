@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <fcntl.h> 
-#include <errno.h> 
+#include <errno.h>
 
 char *trimwhitespace(char *str)
 {
@@ -29,6 +29,10 @@ char *trimwhitespace(char *str)
 }
 
 void parser(char *input, char **command, char *delim) {
+
+	// printf("%s\n", "before parsing");
+	// printf("%s\n", input);
+
 	char *parsedInput = strtok(input, delim);
 
 	int i = 0;
@@ -37,9 +41,25 @@ void parser(char *input, char **command, char *delim) {
 		parsedInput = strtok(NULL, delim);
 	}
 	command[i++] = NULL;
+	// printf("%s\n", "after parsing");
+	// printf("%s\n", input);
 }
 
-int redirection(char *input, char *delim) {
+int redirection(char *input[]) {
+	int i = 0;
+
+	if (input[1] == NULL) {
+		return 0;
+	}
+
+	while(input[i] != NULL) {
+		if (input[i][0] == '1') {
+			
+		}
+	}
+}
+
+int redirection(char *input[], char *delim) {
 	
 	char *c[1024];
 
@@ -122,7 +142,7 @@ void execute(char **command) {
 
 	while (command[i] != NULL) {
 
-		// printf("%s%d\n", "Executing command: ", i);
+		
 		char *cmd = command[i];
 		
 		pipe(fd);
@@ -130,44 +150,69 @@ void execute(char **command) {
 
 		if (pid == 0) {
 
-			int a = redirection(cmd, "<");
+			char *args[1024];
+
+			printf("%s\n", cmd);
+
+			parser(cmd, args, " ");
+
+			// printf("%s\n", "before redirection <");
+			printf("%s\n", cmd);
+			int a = redirection(args);
+			// printf("%s\n", "after redirection <");
+			// printf("%s\n", cmd);
 
 			if (a == -1) {
 				printf("%s\n", "Invalid file");
 			} else {
-				redirection(cmd, ">");
+				// printf("%s\n", "before redirection >");
+				// printf("%s\n", cmd);
+
+				// redirection(cmd, ">");
+
+				// printf("%s\n", "after redirection >");
+				// printf("%s\n", cmd);
 				// redirection(cmd, ">>");
 
-				char *args[1024];
+				char *temp1[1024];
 
-				parser(cmd, args, ">");
-				char *temp1 = args[0];
+				for (int k = 0; args[k] != NULL; k++) {
+					if (args[k][0] == '1' || args[k][0] == '2') {
+						break;
+					}
+
+					if (args[k][0] == '<' || args[k][0] == '>') {
+						break;
+					}
+
+					temp1[k] = args[k];
+					// temp1[k+1] = "\0";
+				}
+
+				char *to_execute = args[0];
 
 				// printf("%s\n", "After trimming >");
 				// printf("%s\n", temp1);
 
-				parser(temp1, args, "<");
-				char *temp2 = args[0];
-
 				// printf("%s\n", "After trimming <");
 				// printf("%s\n", temp2);
-
-				parser(temp2, args, " ");
-
-				char *to_execute = args[0];
 
 				// printf("%s%s\n", "command to execute: ", to_execute);
 				// printf("%s\n", "Arguments passed");
 
-				// for (int i = 0; args[i] != NULL; i++) {
-				// 	printf("%s\n", args[i]);
-				// }
 				dup2(in, 0);
 				if (command[i+1] != NULL) {
 					dup2(fd[1], 1);
 				}
 				close(fd[0]);
-				execvp(to_execute, args);
+
+				// printf("%s\n", to_execute);
+
+				// for (int k = 0; temp1[k] != NULL; k++) {
+				// 	printf("%s\n", temp1[k]);
+				// }
+
+				execvp(to_execute, temp1);
 			}
 		} else if (pid < 0) {
 			printf("%s\n", "Error while executing fork");
