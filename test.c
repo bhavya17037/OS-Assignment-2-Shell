@@ -9,9 +9,19 @@
 #include <errno.h>
 
 int main() {
-	
-	char *input[] = {"ls","-l","1>a.txt"};
-	printf("%c\n", input[2][0]);
+	int pid;
+
+	pid = fork();
+
+	if (pid == 0) {
+		printf("%s\n", "Child" );
+		char *args[] = {"abcd", NULL};
+		execvp(args[0], args);
+	} else {
+		printf("%s\n", "In parent");
+		wait(0);
+		
+	}
 	return 0;
 }
 

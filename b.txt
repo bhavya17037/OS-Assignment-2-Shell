@@ -1,0 +1,6 @@
+a.out
+a.txt
+b.txt
+shell.c
+shellrev.c
+test.c

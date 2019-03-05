@@ -53,86 +53,92 @@ int redirection(char *input[]) {
 	}
 
 	while(input[i] != NULL) {
-		if (input[i][0] == '1') {
-			
-		}
-	}
-}
-
-int redirection(char *input[], char *delim) {
-	
-	char *c[1024];
-
-	parser(input, c, delim);
-
-	int i = 0;
-
-	if (c[1] == NULL) {
-		// printf("%s\n", "No redirection");
-		return 0;
-	}
-
-	if (strcmp(delim, "<") == 0) {
-		// printf("%s\n", "Input redirection");
-		while (c[i+1] != NULL) {
-			i++;
-		}
-		char *arg = c[i];
-		char *file[1024];
-		parser(arg, file, " ");
-
-		close(0);
-		int fd = open(file[0], O_RDONLY);
-
-		return fd;
-
-	} else if (strcmp(delim, ">>") == 0) {
-
-		return 0;
-
-	} else if (strcmp(delim, ">") == 0) {
-
-		// printf("%s\n", "Output redirection");
-
-		while(c[i+1] != NULL) {
-			char *arg1 = trimwhitespace(c[i]);
-			char *arg2 = trimwhitespace(c[i+1]);
-
-			char *file1[1024];
-			char *file2[1024];
-
-			parser(arg1, file1, " ");
-			parser(arg2, file2, " ");
-			int j = 0;
-			while (file1[j+1] != NULL) {
-				j++;
-			}
-
-			if (strcmp(file2[0], "&1") == 0) {
-
-				// printf("%s\n", "Redirecting 2 to 1");
-
-				close(2);
-				dup(1);
-				return 0;
-			} else {
-				if (strcmp(file1[j], "2") == 0) {
-
-					// printf("%s\n", "closing STDERR");
-
-					close(2);
-				} else {
-					// printf("%s\n", "Closing STDOUT");
-					close(1);
-				}
-				// printf("%s\n", "creating file");
-				int fd = open(file2[0], O_CREAT | O_RDWR, 0666);
+		if (input[i][0] == '1' && input[i][1] == '>') {
+			if (input[i][2] == NULL) {
+				close(0);
+				int fd = open(input[i+1][0], O_RDONLY);
 				return fd;
+			} else {
+				
 			}
-			i++;
 		}
 	}
 }
+
+// int redirection(char *input[], char *delim) {
+	
+// 	char *c[1024];
+
+// 	parser(input, c, delim);
+
+// 	int i = 0;
+
+// 	if (c[1] == NULL) {
+// 		// printf("%s\n", "No redirection");
+// 		return 0;
+// 	}
+
+// 	if (strcmp(delim, "<") == 0) {
+// 		// printf("%s\n", "Input redirection");
+// 		while (c[i+1] != NULL) {
+// 			i++;
+// 		}
+// 		char *arg = c[i];
+// 		char *file[1024];
+// 		parser(arg, file, " ");
+
+// 		close(0);
+// 		int fd = open(file[0], O_RDONLY);
+
+// 		return fd;
+
+// 	} else if (strcmp(delim, ">>") == 0) {
+
+// 		return 0;
+
+// 	} else if (strcmp(delim, ">") == 0) {
+
+// 		// printf("%s\n", "Output redirection");
+
+// 		while(c[i+1] != NULL) {
+// 			char *arg1 = trimwhitespace(c[i]);
+// 			char *arg2 = trimwhitespace(c[i+1]);
+
+// 			char *file1[1024];
+// 			char *file2[1024];
+
+// 			parser(arg1, file1, " ");
+// 			parser(arg2, file2, " ");
+// 			int j = 0;
+// 			while (file1[j+1] != NULL) {
+// 				j++;
+// 			}
+
+// 			if (strcmp(file2[0], "&1") == 0) {
+
+// 				// printf("%s\n", "Redirecting 2 to 1");
+
+// 				close(2);
+// 				dup(1);
+// 				return 0;
+// 			} else {
+// 				if (strcmp(file1[j], "2") == 0) {
+
+// 					// printf("%s\n", "closing STDERR");
+
+// 					close(2);
+// 				} else {
+// 					// printf("%s\n", "Closing STDOUT");
+// 					close(1);
+// 				}
+// 				// printf("%s\n", "creating file");
+// 				int fd = open(file2[0], O_CREAT | O_RDWR, 0666);
+// 				return fd;
+// 			}
+// 			i++;
+// 		}
+// 	}
+// }
 
 void execute(char **command) {
 	int i = 0;
