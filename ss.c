@@ -313,13 +313,6 @@ int main() {
 		char *tt[10];
 		parser(tempinput, tt, " ");
 		if(strcmp(tt[0], "cd") == 0 && tt[1] != NULL && tt[2] == NULL){
-			// char *gdir;
-			// char *dir;
-			// char *to;
-			// char buf[1000];
-			//gdir = getcwd(buf, sizeof(buf));
-            //dir = strcat(gdir, "/");
-            //to = strcat(dir, tt[1]);
             chdir(tt[1]);
 		}else{
 			char *command[1024];
